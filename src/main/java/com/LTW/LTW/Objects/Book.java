@@ -1,10 +1,11 @@
 package com.LTW.LTW.Objects;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class Book {
+public class Book implements Serializable  {
 	private int bookId = 0;
 	private String title = "";
 	private String author = "";

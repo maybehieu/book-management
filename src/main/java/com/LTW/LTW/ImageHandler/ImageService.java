@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ImageService {
-	private static final String FOLDER_PATH = "/LTW/images/";
+	private static final String FOLDER_PATH = new File("").getAbsolutePath() + "/frontend/images/";
 	
 	public static String uploadImage(MultipartFile file) throws IOException {
 		try {

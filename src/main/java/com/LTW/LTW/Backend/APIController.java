@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,8 +25,9 @@ public class APIController {
 		return dao.getBookCover(bookId);
 	}
 	
+	@CrossOrigin
 	@PostMapping("/save")
-	public String saveBook(@RequestBody Book book) throws IOException {
+	public String saveBook(@ModelAttribute Book book) throws IOException {
 		return dao.save(book);
 	}
 	

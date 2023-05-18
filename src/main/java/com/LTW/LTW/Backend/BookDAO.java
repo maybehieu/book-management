@@ -23,10 +23,10 @@ public class BookDAO {
 	private static final String SELECT_BOOKCOVER_BY_ID_STRING = "select coverPath from book where bookId=?";
 	private static final String CHECK_BOOK_EXISTENCE = "select * from book where bookId!=? and title=? and author=?";
 	private static final String INSERT_BOOKS_SQL = 
-			"insert into book (title, author, description, releaseDate, categoryId, price, pageNum, coverPath) "
-			+ "values(?,?,?,?,?,?,?,?)";
+			"insert into book (title, author, description, releaseDate, categoryId, pageNum, coverPath) "
+			+ "values(?,?,?,?,?,?,?)";
 	private static final String UPDATE_BOOKS_SQL = "update book set title=?,author=?,description=?,releaseDate=?,"
-			+ "categoryId=?,price=?,pageNum=?,coverPath=?"
+			+ "categoryId=?,pageNum=?,coverPath=?"
 			+ " where bookId=?";
 	private static final String DELETE_BOOK_SQL_STRING = "delete from book where bookId=?";
 	
@@ -170,9 +170,8 @@ public class BookDAO {
 			ps.setString(3, book.getDescription());
 			ps.setDate(4, book.getReleaseDate());
 			ps.setInt(5, book.getCategoryId());
-			ps.setInt(6, book.getPrice());
-			ps.setInt(7, book.getNumPage());
-			ps.setString(8, imgPath);
+			ps.setInt(6, book.getNumPage());
+			ps.setString(7, imgPath);
 
 			ps.execute();
 
@@ -213,9 +212,8 @@ public class BookDAO {
 			ps.setString(3, book.getDescription());
 			ps.setDate(4, book.getReleaseDate());
 			ps.setInt(5, book.getCategoryId());
-			ps.setInt(6, book.getPrice());
-			ps.setInt(7, book.getNumPage());
-			ps.setString(8, imgPath);
+			ps.setInt(6, book.getNumPage());
+			ps.setString(7, imgPath);
 
 			ps.execute();
 
