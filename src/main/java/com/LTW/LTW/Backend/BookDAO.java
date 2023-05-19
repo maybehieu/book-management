@@ -8,10 +8,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.LTW.LTW.ImageHandler.ImageService;
 import com.LTW.LTW.Objects.Book;
+import com.LTW.LTW.Objects.Category;
 
 public class BookDAO {
 	private String jdbcURL = "jdbc:mysql://localhost:3306/LTWBook";
@@ -19,6 +22,7 @@ public class BookDAO {
 	private String jdbcPassword = "1234";
 	
 	private static final String SELECT_ALL_BOOK = "select * from book";
+	private static final String SELECT_ALL_CATEGORIES = "select * from category";
 	private static final String SELECT_BOOK_BY_ID = "select * from book where bookId=?";
 	private static final String SELECT_BOOKCOVER_BY_ID_STRING = "select coverPath from book where bookId=?";
 	private static final String CHECK_BOOK_EXISTENCE = "select * from book where bookId!=? and title=? and author=?";
@@ -27,6 +31,9 @@ public class BookDAO {
 			+ "values(?,?,?,?,?,?,?)";
 	private static final String UPDATE_BOOKS_SQL = "update book set title=?,author=?,description=?,releaseDate=?,"
 			+ "categoryId=?,pageNum=?,coverPath=?"
+			+ " where bookId=?";
+	private static final String UPDATE_BOOK_SQL_NOCOVER = "update book set title=?,author=?,description=?,releaseDate=?,"
+			+ "categoryId=?,pageNum=?"
 			+ " where bookId=?";
 	private static final String DELETE_BOOK_SQL_STRING = "delete from book where bookId=?";
 	
@@ -49,6 +56,24 @@ public class BookDAO {
 		return connection;
 	}
 	
+	public List<Category> getAllCategory() {
+		List<Category> categories = new ArrayList<>();
+		try (
+				Connection connection = getConnection();
+				PreparedStatement ps = connection.prepareStatement(SELECT_ALL_CATEGORIES);
+			) {
+				ResultSet resultSet = ps.executeQuery();
+				while (resultSet.next()) {
+					int id = resultSet.getInt("id");
+					String title = resultSet.getString("categoryName");
+					categories.add(new Category(id, title));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return categories;
+	}
+	
 	public List<Book> selectAll() {
 		List<Book> books = new ArrayList<>();
 		try (
@@ -63,11 +88,11 @@ public class BookDAO {
 				String description = resultSet.getString("description");
 				Date date = resultSet.getDate("releaseDate");
 				int categoryId = resultSet.getInt("categoryId");
-				int price = resultSet.getInt("price");
 				int pageNum = resultSet.getInt("pageNum");
+				int sold = resultSet.getInt("numSold");
 				String coverPath = resultSet.getString("coverPath");
 				
-				books.add(new Book(id, title, author, description, date, categoryId, price, pageNum, coverPath));
+				books.add(new Book(id, title, author, description, date, categoryId, pageNum, sold, coverPath));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -90,11 +115,11 @@ public class BookDAO {
 					String description = resultSet.getString("description");
 					Date date = resultSet.getDate("releaseDate");
 					int categoryId = resultSet.getInt("categoryId");
-					int price = resultSet.getInt("price");
 					int pageNum = resultSet.getInt("pageNum");
+					int sold = resultSet.getInt("numSold");
 					String coverPath = resultSet.getString("coverPath");
 					
-					book = new Book(bookId, title, author, description, date, categoryId, price, pageNum, coverPath);
+					book = new Book(bookId, title, author, description, date, categoryId, pageNum, sold, coverPath);
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -122,6 +147,12 @@ public class BookDAO {
 		return false;
 	}
 	
+	private Map<String, String> makeResponse(String resp) {
+		Map<String, String> ret = new HashMap<>();
+		ret.put("response", resp);
+		return ret;
+	}
+	
 	public byte[] getBookCover(int bookId) throws IOException {
 		String filePath = "";
 		try (
@@ -140,12 +171,12 @@ public class BookDAO {
 		return ImageService.getImageData(filePath);
 	}
 	
-	public String save(Book book) {
+	public Map<String, String> save(Book book) {
 		if (existed(book)) {
-			return "Book already existed!";
+			return makeResponse("Book already existed!");
 		}
 		if (book.getTitle().trim().equals("")) {
-			return "Book title musn't be empty!";
+			return makeResponse("Book title musn't be empty!");
 		}
 		//save and get image path
 		String imgPath = "";
@@ -153,11 +184,11 @@ public class BookDAO {
 			imgPath = ImageService.uploadImage(book.getImageFile());
 			//check if saving image successful or not
 			if (imgPath.equals(null)) {
-				return "Can't save image to local storage, operation aborted!";
+				return makeResponse("Can't save image to local storage, operation aborted!");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return "Can't save image to local storage, operation aborted!";
+			return makeResponse("Can't save image to local storage, operation aborted!");
 		}
 		try (
 				Connection connection = getConnection();
@@ -175,19 +206,19 @@ public class BookDAO {
 
 			ps.execute();
 
-			return "Save book successful!";
+			return makeResponse("Save book successful!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "Internal error!";
+		return makeResponse("Internal error!");
 	}
 	
-	public String edit(Book book) {
+	public Map<String, String> edit(Book book) {
 		if (existed(book)) {
-			return "Book already existed!";
+			return makeResponse("Book already existed!");
 		}
 		if (book.getTitle().trim().equals("")) {
-			return "Book title musn't be empty!";
+			return makeResponse("Book title musn't be empty!");
 		}
 		//save and get image path
 		String imgPath = "";
@@ -195,36 +226,40 @@ public class BookDAO {
 			imgPath = ImageService.uploadImage(book.getImageFile());
 			//check if saving image successful or not
 			if (imgPath.equals(null)) {
-				return "Can't save image to local storage, operation aborted!";
+				return makeResponse("Can't save image to local storage, operation aborted!");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return "Can't save image to local storage, operation aborted!";
+			return makeResponse("Can't save image to local storage, operation aborted!");
 		}
 		try (
 				Connection connection = getConnection();
-				PreparedStatement ps = connection.prepareStatement(UPDATE_BOOKS_SQL);
+				PreparedStatement ps = connection.prepareStatement(imgPath.equals("") ? UPDATE_BOOK_SQL_NOCOVER : UPDATE_BOOKS_SQL);
 			)
 		{
-
 			ps.setString(1, book.getTitle());
 			ps.setString(2, book.getAuthor());
 			ps.setString(3, book.getDescription());
 			ps.setDate(4, book.getReleaseDate());
 			ps.setInt(5, book.getCategoryId());
 			ps.setInt(6, book.getNumPage());
-			ps.setString(7, imgPath);
-
+			if (!imgPath.equals("")) {
+				ps.setString(7, imgPath);
+				ps.setInt(8, book.getBookId());
+			} else {
+				ps.setInt(7, book.getBookId());
+			}
+			
 			ps.execute();
 
-			return "Save book successful!";
+			return makeResponse("Update book successful!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "Internal error!";
+		return makeResponse("Internal error!");
 	}
 	
-	public String delete(int id) {
+	public Map<String, String> delete(int id) {
 		try (
 				Connection connection = getConnection();
 				PreparedStatement ps = connection.prepareStatement(DELETE_BOOK_SQL_STRING);
@@ -232,10 +267,10 @@ public class BookDAO {
 			ps.setInt(1, id);
 			ps.execute();
 			
-			return "Delete book successfully!";
+			return makeResponse("Delete book successfully!");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return "Internal error!";
+		return makeResponse("Internal error!");
 	}
 }

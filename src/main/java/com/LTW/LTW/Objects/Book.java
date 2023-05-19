@@ -12,8 +12,8 @@ public class Book implements Serializable  {
 	private String description = "";
 	private Date releaseDate;
 	private int categoryId = 0;
-	private int price = 0;
 	private int numPage = 0;
+	private int numSold = 0;
 	private MultipartFile imageFile;
 	private String imgPath = "";
 	
@@ -23,7 +23,7 @@ public class Book implements Serializable  {
 	}
 
 	public Book(int bookcode, String title, String author, String descriptionString, Date releaseDate, int categoryId,
-			int price, int numPage, MultipartFile imageFile) {
+			int numPage, int numSold, MultipartFile imageFile) {
 		super();
 		this.bookId = bookcode;
 		this.title = title;
@@ -31,13 +31,13 @@ public class Book implements Serializable  {
 		this.description = descriptionString;
 		this.releaseDate = releaseDate;
 		this.categoryId = categoryId;
-		this.price = price;
 		this.numPage = numPage;
+		this.numSold = numSold;
 		this.imageFile = imageFile;
 	}
 
 	public Book(int bookcode, String title, String author, String descriptionString, Date releaseDate, int categoryId,
-			int price, int numPage, String imagePath) {
+			int numPage, int numSold, String imagePath) {
 		super();
 		this.bookId = bookcode;
 		this.title = title;
@@ -45,8 +45,8 @@ public class Book implements Serializable  {
 		this.description = descriptionString;
 		this.releaseDate = releaseDate;
 		this.categoryId = categoryId;
-		this.price = price;
 		this.numPage = numPage;
+		this.numSold = numSold;
 		this.imgPath = imagePath;
 	}
 
@@ -121,13 +121,13 @@ public class Book implements Serializable  {
 	public void setCategoryId(int categoryId) {
 		this.categoryId = categoryId;
 	}
-
-	public int getPrice() {
-		return price;
+	
+	public int getNumSold() {
+		return numSold;
 	}
 
-	public void setPrice(int price) {
-		this.price = price;
+	public void setNumSold(int copiesSold) {
+		this.numSold = copiesSold;
 	}
 
 	public int compareBook(Book b1) {

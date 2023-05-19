@@ -10,6 +10,8 @@ const AdminBookDetail = ({ add }) => {
     const [saveBtn, setSaveBtn] = useState('Add');
     const [editState, setEditState] = useState(false)
 
+    let editEnable = false;
+
     // book properties
     const [book, setBook] = useState({
         'bookId': -1,
@@ -20,7 +22,8 @@ const AdminBookDetail = ({ add }) => {
         'categoryId': -1,
         'price': 0,
         'pageNum': 0,
-        'imageFile': undefined
+        'imageFile': undefined,
+        'imagePath': ''
     });
     const [bookid, setBookId] = useState(-1)
     const [title, setTitle] = useState('')
@@ -30,14 +33,33 @@ const AdminBookDetail = ({ add }) => {
     const [catId, setCatId] = useState(-1)
     const [price, setPrice] = useState(0)
     const [pageNum, setPageNum] = useState(0)
+    const [numSold, setNumSold] = useState(0)
     const [imageFile, setImageFile] = useState()
+    const [imagePath, setImagePath] = useState('')
 
     let { bookId } = useParams();
+
+    const dummyFile = new File(["foo"], "null.txt", {
+        type: "text/plain",
+    });
+
+    const setBookData = (book) => {
+        setBookId(book.bookId)
+        setTitle(book.title)
+        setAuthor(book.author)
+        setDesc(book.description)
+        setPageNum(book.numPage)
+        setNumSold(book.numSold)
+        setDate(book.releaseDate)
+        setCatId(book.categoryId)
+        setPreview("http://localhost:9091/server/image/" + bookId)
+    }
 
     // create a preview as a side effect, whenever selected file is changed
     useEffect(() => {
         if (add) {
             setEditState(true)
+            editEnable = true;
             setSaveBtn('Add')
             console.log('adding new book')
             // adding new book
@@ -51,57 +73,32 @@ const AdminBookDetail = ({ add }) => {
         } else {
             // view book in database
             setSaveBtn('Edit')
-            fetch("http://localhost:9091/server/book/" + bookId)
+            setBookId(bookId)
+            fetch("http://localhost:9091/server/select/" + bookId, {
+                method: 'GET'
+            })
                 .then((response) => response.json())
                 // .then((data) => console.log(data))
                 .then((data) => {
                     setBook(data);
+                    setBookData(data);
                 })
                 .catch((err) => console.log(err));
             // get cover preview
-            fetch("http://localhost:9091/server/image/" + bookId)
-                .then((response) => {
-                    setPreview(response)
-                    setImageUrl(response)
-                })
-                .catch((err) => console.log(err))
+            // fetch("http://localhost:9091/server/image/" + bookId)
+            //     .then((response) => {
+            //         // const objectUrl = URL.createObjectURL(response);
+            //         console.log(response)
+            //         setPreview(response);
+            //     })
+            //     .catch((err) => console.log(err))
+            // if (imagePath != '') {
+            //     const objectUrl = URL.createObjectURL(imagePath);
+            //     setPreview(objectUrl);
+            // }
 
         }
     }, [selectedFile]);
-
-    // const onSelectFile = async (e) => {
-
-    //     const convertBlobToBase64 = (blob) => new Promise((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.onerror = reject;
-    //         reader.onload = () => {
-    //             resolve(reader.result);
-    //         };
-    //         reader.readAsDataURL(blob);
-    //     });
-
-    //     if (!e.target.files || e.target.files.length === 0) {
-    //         setSelectedFile(undefined);
-    //         return;
-    //     }
-    //     // I've kept this example simple by using the first image instead of multiple
-    //     console.log(e.target.files[0], typeof (e.target.files[0]))
-    //     // setSelectedFile(e.target.files[0]);
-    //     // convert image to b64string
-    //     let b64String = await convertBlobToBase64(e.target.files[0])
-
-    //     console.log(typeof (b64String))
-    //     // convert b64string to image
-    //     const convB64toBlob = async (b64) => {
-    //         const ret = await fetch(b64)
-    //         let blob = await ret.blob()
-    //         console.log(blob)
-    //         return blob
-    //     }
-    //     let blob = await convB64toBlob(b64String)
-    //     console.log(blob)
-    //     setSelectedFile(blob);
-    // };
 
     const onSelectFile = (e) => {
         if (!e.target.files || e.target.files.length === 0) {
@@ -110,14 +107,15 @@ const AdminBookDetail = ({ add }) => {
         }
         setSelectedFile(e.target.files[0]);
         setImageFile(e.target.files[0]);
+        //console.log(e.target.files[0])
     }
 
     const navigate = useNavigate()
 
     const saveHandler = (e) => {
+        e.preventDefault()
         if (editState == true) {
             console.log('update btn called')
-            e.preventDefault()
             var bookform = new FormData()
             bookform.append('bookId', bookid)
             bookform.append('title', title)
@@ -125,10 +123,33 @@ const AdminBookDetail = ({ add }) => {
             bookform.append('description', desc)
             bookform.append('releaseDate', date)
             bookform.append('categoryId', catId)
-            bookform.append('price', price)
-            bookform.append('pageNum', pageNum)
+            // bookform.append('price', price)
+            bookform.append('numPage', pageNum)
+            // empty image bypass 
+            if (imageFile == undefined) {
+                bookform.append('imageFile', dummyFile)
+            }
             bookform.append('imageFile', imageFile)
-            if (bookid != 1) {
+
+            //console.log(bookid, title, author, desc, date, catId, pageNum, imageFile)
+            //console.log(bookform)
+            if (bookid != -1) {
+                fetch('http://localhost:9091/server/update', {
+                    method: 'POST',
+                    body: bookform
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data)
+                        if (data.response === 'Update book successful!') {
+                            navigate('/')
+                        } else {
+                            // display error popup
+                            alert(data.response)
+                        }
+                    })
+            }
+            else if (bookid == -1) {
                 fetch('http://localhost:9091/server/save', {
                     method: 'POST',
                     body: bookform
@@ -136,21 +157,21 @@ const AdminBookDetail = ({ add }) => {
                     .then((response) => response.json())
                     .then((data) => {
                         console.log(data)
-                        if (data.result === 'Save book successful!') {
+                        if (data.response === 'Save book successful!') {
                             navigate('/')
                         } else {
                             // display error popup
-                            alert(data.result)
+                            alert(data.response)
                         }
                     })
-            }
-            else if (bookid == -1) {
-
             }
 
         } else {
             setEditState(true);
+            editEnable = true;
+            console.log('set edit on')
             setSaveBtn('Save')
+            return;
         }
     }
 
@@ -274,11 +295,16 @@ const AdminBookDetail = ({ add }) => {
                                     aria-label="Floating label select example"
                                     onChange={(event) => { setCatId(event.target.value) }}
                                     disabled={(editState) ? "" : "disabled"}
+                                    value={catId}
                                 >
                                     <option selected>Open this select menu</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
+                                    <option value="1">Romance</option>
+                                    <option value="2">Cookbook</option>
+                                    <option value="3">Health</option>
+                                    <option value="4">Science Fiction</option>
+                                    <option value="5">History</option>
+                                    <option value="6">Education</option>
+                                    <option value="7">Kid</option>
 
                                 </select>
                             </div>
