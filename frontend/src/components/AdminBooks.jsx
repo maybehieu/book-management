@@ -51,50 +51,51 @@ function AdminBooks(props) {
 
     return (
         <div>
-            <div class="header">
-                This is header
-            </div>
             <h2 className="text-center">Books List</h2>
             <div className="row">
-                <button className="btn btn-primary" onClick={addBook}>
-                    Add Book
-                </button>
+                <div className="col-md-8 offset-md-2 mb-4">
+                    <button className="btn btn-primary" onClick={addBook}>
+                        Add Book
+                    </button>
+                </div>
             </div>
             <div className="row">
-                <table className="table table-striped table-bordered mb-0">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Category</th>
-                            <th>Release Date</th>
-                            <th>Number of pages</th>
-                            <th>Copies sold</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {books.map((book) => (
-                            <tr key={book.bookId}>
-                                <td> {book.title} </td>
-                                <td> {book.author} </td>
-                                <td> {categories[book.categoryId - 1].categoryName}</td>
-                                <td> {book.releaseDate} </td>
-                                <td> {book.numPage} </td>
-                                <td> {book.numSold}</td>
-                                <td>
-                                    <button className="btn btn-primary" onClick={() => {
-                                        editBook(book.bookId)
-                                    }}>View</button>
-                                    <button className="btn btn-danger" onClick={() => {
-                                        deleteBook(book.bookId)
-                                    }}>Delete</button>
-                                </td>
+                <div className="col-md-8 offset-md-2">
+                    <table className="table table-striped table-bordered mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Release Date</th>
+                                <th>Number of pages</th>
+                                <th>Copies sold</th>
+                                <th>Action</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody>
+                            {books.map((book) => (
+                                <tr key={book.bookId}>
+                                    <td> {book.title} </td>
+                                    <td> {book.author} </td>
+                                    <td> {categories[book.categoryId - 1].categoryName}</td>
+                                    <td> {book.releaseDate} </td>
+                                    <td> {book.numPage} </td>
+                                    <td> {book.numSold}</td>
+                                    <td>
+                                        <button className="btn btn-primary" onClick={() => {
+                                            editBook(book.bookId)
+                                        }}>View</button>
+                                        <button className="btn btn-danger" onClick={() => {
+                                            deleteBook(book.bookId)
+                                        }}>Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )

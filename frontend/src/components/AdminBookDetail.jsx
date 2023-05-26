@@ -324,14 +324,15 @@ const AdminBookDetail = ({ add }) => {
                             </label>
                             {/* <!-- File container --> */}
                             <div
-                                style={{ height: "400px" }}
-                                class="overflow-hidden rounded border"
+                                style={{ maxHeight: "400px", display: 'flex', justifyContent: 'center', alignContent: 'center' }}
+                                class="img-fluid rounded border"
                             >
                                 <img
                                     src={preview}
                                     title="image"
                                     class="img-fluid"
                                     id="demo-image"
+                                    style={{ maxHeight: "400px" }}
                                 />
                             </div>
                         </div>
