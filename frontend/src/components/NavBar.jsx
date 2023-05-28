@@ -1,117 +1,74 @@
-import React from 'react'
-
+import React, { useContext, useState } from 'react'
+import { AuthContext } from './AuthContext'
 const NavBar = () => {
+  const { isLoggedIn, activeUser } = useContext(AuthContext);
+  const { updateLoginStatus, updateAdminStatus, updateActiveUser } = useContext(AuthContext);
+
+  const logoutHandle = () => {
+    updateActiveUser('')
+    updateAdminStatus(false)
+    updateLoginStatus(false)
+  }
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
-      <div className="container-fluid">
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-mdb-toggle="collapse"
-          data-mdb-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <i className="fas fa-bars"></i>
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <a className="navbar-brand mt-2 mt-lg-0" href="#" />
-          <img
-            src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp"
-            height="15"
-            alt="MDB Logo"
-            loading="lazy"
-          />
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <a className="nav-link" href="#">Dashboard</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">Team</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">Projects</a>
-            </li>
-          </ul>
-          {/* <!-- Left links --> */}
-        </div>
-        {/* <!-- Collapsible wrapper --> */}
-
-        {/* <!-- Right elements --> */}
-        <div className="d-flex align-items-center">
-          {/* <!-- Icon --> */}
-          <a className="text-reset me-3" href="#">
-            <i className="fas fa-shopping-cart"></i>
-          </a>
-
-          {/* <!-- Notifications --> */}
-          <div className="dropdown">
-            <a
-              className="text-reset me-3 dropdown-toggle hidden-arrow"
-              href="#"
-              id="navbarDropdownMenuLink"
-              role="button"
-              data-mdb-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <i className="fas fa-bell"></i>
-              <span className="badge rounded-pill badge-notification bg-danger">1</span>
-            </a>
-            <ul
-              className="dropdown-menu dropdown-menu-end"
-              aria-labelledby="navbarDropdownMenuLink"
-            >
-              <li>
-                <a className="dropdown-item" href="#">Some news</a>
-              </li>
-              <li>
-                <a className="dropdown-item" href="#">Another news</a>
-              </li>
-              <li>
-                <a className="dropdown-item" href="#">Something else here</a>
-              </li>
-            </ul>
-          </div>
-          {/* <!-- Avatar --> */}
-          <div className="dropdown">
-            <a
-              className="dropdown-toggle d-flex align-items-center hidden-arrow"
-              href="#"
-              id="navbarDropdownMenuAvatar"
-              role="button"
-              data-mdb-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <img
-                src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
-                className="rounded-circle"
-                height="25"
-                alt="Black and White Portrait of a Man"
+    <div>
+      {/* <!-- Navbar --> */}
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        {/* <!-- Container wrapper --> */}
+        <div className="container-fluid">
+          {/* <!-- Collapsible wrapper --> */}
+          <div className="collapse navbar-collapse " id="navbarSupportedContent">
+            {/* <!-- Navbar brand --> */}
+            <a className="navbar-brand mt-2 mt-lg-0" href="http://localhost:3000/">
+              {/* <img
+                src="https://media.istockphoto.com/id/1338909550/vector/open-book-logo-emblem-for-a-bookstore-or-typography-in-a-minimal-style-of-thin-lines.jpg?s=612x612&w=0&k=20&c=8Zo_oTs31xuGwPkBU2RE1IdnVPKWEPAoCkDh2fpstkI="
+                height="55"
+                alt="Bookstore Logo"
                 loading="lazy"
-              />
+              /> */}
+              <i className="fa fa-book fa-lg" aria-hidden="true"></i>
             </a>
-            <ul
-              className="dropdown-menu dropdown-menu-end"
-              aria-labelledby="navbarDropdownMenuAvatar"
-            >
-              <li>
-                <a className="dropdown-item" href="#">My profile</a>
-              </li>
-              <li>
-                <a className="dropdown-item" href="#">Settings</a>
-              </li>
-              <li>
-                <a className="dropdown-item" href="#">Logout</a>
+            {/* <!-- Left links --> */}
+            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+              <li className="nav-item">
+                <a className="nav-link" href="http://localhost:3000/">Home</a>
               </li>
             </ul>
+            {/* <!-- Left links --> */}
           </div>
+          {/* <!-- Collapsible wrapper --> */}
+
+          {/* <!-- Right elements --> */}
+          <div className="d-flex align-items-center">
+            <div className="d-flex align-items-center me-3">
+              <p className="text-reset mb-0">
+                {isLoggedIn ? `Hello, ${activeUser}!` : ''}
+              </p>
+            </div>
+
+            <div className="d-flex align-items-center me-3">
+              <a className="text-reset" href="http://localhost:3000/cart">
+                <i className="fas fa-shopping-cart fa-lg"></i>
+              </a>
+            </div>
+
+            <div className="d-flex align-items-center me-3">
+              {isLoggedIn ? (
+                <a className="text-reset" href="http://localhost:3000/login" onClick={logoutHandle}>
+                  <i className="fas fa-sign-out fa-lg"></i>
+                </a>
+              ) : (
+                <a className="text-reset" href="http://localhost:3000/login">
+                  <i className="fas fa-sign-in fa-lg"></i>
+                </a>
+              )}
+            </div>
+          </div>
+          {/* <!-- Right elements --> */}
         </div>
-        {/* <!-- Right elements --> */}
-      </div>
-      {/* <!-- Container wrapper --> */}
-    </nav>
+        {/* <!-- Container wrapper --> */}
+      </nav>
+      {/* <!-- Navbar --> */}
+    </div>
   )
 }
 

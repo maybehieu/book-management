@@ -10,25 +10,28 @@ import CustomerBooks from './components/CustomerBooks';
 import Register from './components/Register';
 import Login from './components/Login';
 import NavBar from './components/NavBar';
+import { AuthContextProvider } from './components/AuthContext';
+import Cart from './components/Cart';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <NavBar />
-      <Routes>
-        <Route path='/' element={<App />} />
-        <Route path='/book-add' element={<AdminBookDetail add />} />
-        <Route path='/book-update/:bookId' element={<AdminBookDetail />} />
-        <Route path='/book/:bookId' element={<CustomerBookDetails />} />
-        <Route path='/demoBook' element />
-        <Route path='/register' element={<Register />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/nav' element={<NavBar />} />
-        <Route path='/books' element={<CustomerBooks />} />
+    <AuthContextProvider>
+      <BrowserRouter>
+        <NavBar />
+        <Routes>
+          <Route path='/' element={<App />} />
+          <Route path='/book-add' element={<AdminBookDetail add />} />
+          <Route path='/book-update/:bookId' element={<AdminBookDetail />} />
+          <Route path='/book/:bookId' element={<CustomerBookDetails />} />
+          <Route path='/register' element={<Register />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/books' element={<CustomerBooks />} />
+          <Route path='/cart' element={<Cart />} />
 
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </AuthContextProvider>
   </React.StrictMode>
 );
 

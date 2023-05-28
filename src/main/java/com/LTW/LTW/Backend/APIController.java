@@ -26,6 +26,8 @@ import com.LTW.LTW.Objects.Category;
 @CrossOrigin
 public class APIController {
 	BookDAO dao = new BookDAO();
+	UserDAO uDao = new UserDAO();
+	ReviewDAO rDao = new ReviewDAO();
 	
 	@GetMapping("/image/{bookId}")
 	public ResponseEntity<?> getImage(@PathVariable int bookId) throws IOException {
@@ -66,5 +68,36 @@ public class APIController {
 	@DeleteMapping("/delete/{bookId}")
 	public Map<String, String> deleteBook(@PathVariable int bookId) throws IOException {
 		return dao.delete(bookId);
+	}
+	
+	@GetMapping("/users")
+	public List<String> getUsernames() throws IOException {
+		return uDao.getUsername();
+	}
+	
+	@PostMapping("/user-register")
+	public Map<String, String> userRegister(@ModelAttribute User user) throws IOException {
+		System.out.println("registering");
+		return uDao.registerUser(user);
+	}
+	
+	@PostMapping("/user-login")
+	public Map<String, String> userLogin(@ModelAttribute User user) throws IOException {
+		return uDao.userLogin(user);
+	}
+	
+	@PostMapping("/add-review")
+	public Map<String, String> addReview(@ModelAttribute Review review) throws IOException {
+		return rDao.addReview(review);
+	}
+	
+	@GetMapping("/review/{bookId}")
+	public List<Review> getReviews(@PathVariable int bookId) throws IOException {
+		return rDao.getAllReview(bookId);
+	}
+	
+	@GetMapping("/rating/{bookId}")
+	public float getRating(@PathVariable int bookId) throws IOException {
+		return rDao.getBookRating(bookId);
 	}
 }

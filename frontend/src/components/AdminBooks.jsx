@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
 
 function AdminBooks(props) {
+    const { isLoggedIn } = useContext(AuthContext)
+
     const [books, setBooks] = useState([])
     const [categories, setCategories] = useState([])
 
@@ -83,14 +86,18 @@ function AdminBooks(props) {
                                     <td> {book.releaseDate} </td>
                                     <td> {book.numPage} </td>
                                     <td> {book.numSold}</td>
-                                    <td>
-                                        <button className="btn btn-primary" onClick={() => {
-                                            editBook(book.bookId)
-                                        }}>View</button>
-                                        <button className="btn btn-danger" onClick={() => {
-                                            deleteBook(book.bookId)
-                                        }}>Delete</button>
-                                    </td>
+                                    {
+                                        isLoggedIn ? (
+                                            <td>
+                                                <button className="btn btn-primary" onClick={() => {
+                                                    editBook(book.bookId)
+                                                }}>View</button>
+                                                <button className="btn btn-danger" onClick={() => {
+                                                    deleteBook(book.bookId)
+                                                }}>Delete</button>
+                                            </td>
+                                        ) : (<td></td>)
+                                    }
                                 </tr>
                             ))}
                         </tbody>

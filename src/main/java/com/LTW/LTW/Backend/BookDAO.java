@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,18 @@ public class BookDAO {
 				
 				books.add(new Book(id, title, author, description, date, categoryId, pageNum, sold, coverPath));
 			}
+			books.sort(new Comparator<Book>() {
+
+				@Override
+				public int compare(Book o1, Book o2) {
+					if (o1.getBookId() < o2.getBookId())
+						return -1;
+					if (o1.getBookId() > o2.getBookId())
+						return 11;
+					return 0;
+				}
+				
+			});
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
