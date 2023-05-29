@@ -120,8 +120,10 @@ public class UserDAO {
 			// check admin
 			if (role.equals("admin")) {
 				return makeResponse("valid0");				
+			} else if (role.equals("user")) {
+				return makeResponse("valid1");				
 			}
-			return makeResponse("valid1");
+			return makeResponse("null");
 		} catch (SQLException e) {
 			// TODO: handle exception
 			e.printStackTrace();

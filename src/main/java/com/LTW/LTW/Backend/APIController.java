@@ -1,7 +1,6 @@
 package com.LTW.LTW.Backend;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,13 +23,14 @@ import com.LTW.LTW.Objects.Category;
 @RequestMapping("/server")
 @CrossOrigin
 public class APIController {
-	BookDAO dao = new BookDAO();
+	BookDAO bDao = new BookDAO();
 	UserDAO uDao = new UserDAO();
 	ReviewDAO rDao = new ReviewDAO();
+	CartDAO cDao = new CartDAO();
 	
 	@GetMapping("/image/{bookId}")
 	public ResponseEntity<?> getImage(@PathVariable int bookId) throws IOException {
-		byte[] imageData = dao.getBookCover(bookId);
+		byte[] imageData = bDao.getBookCover(bookId);
 		return ResponseEntity.status(HttpStatus.OK)
 				.contentType(MediaType.valueOf("image/png"))
 				.body(imageData);
@@ -39,35 +38,35 @@ public class APIController {
 	
 	@GetMapping("/books")
 	public List<Book> getAll() throws IOException {
-		return dao.selectAll();
+		return bDao.selectAll();
 	}
 	
 	@CrossOrigin
 	@GetMapping("/categories")
 	public List<Category> getCategories() throws IOException {
-		return dao.getAllCategory();
+		return bDao.getAllCategory();
 	}
 	
 	@CrossOrigin
 	@PostMapping("/save")
 	public Map<String, String> saveBook(@ModelAttribute Book book) throws IOException {
-		return dao.save(book);
+		return bDao.save(book);
 	}
 	
 	@GetMapping("/select/{bookId}")
 	public Book getById(@PathVariable int bookId) throws IOException {
-		return dao.selectById(bookId);
+		return bDao.selectById(bookId);
 	}
 	
 	
 	@PostMapping("/update")
 	public Map<String, String> updateBook(@ModelAttribute Book book) throws IOException {
-		return dao.edit(book);
+		return bDao.edit(book);
 	}
 	
 	@DeleteMapping("/delete/{bookId}")
 	public Map<String, String> deleteBook(@PathVariable int bookId) throws IOException {
-		return dao.delete(bookId);
+		return bDao.delete(bookId);
 	}
 	
 	@GetMapping("/users")
@@ -99,5 +98,30 @@ public class APIController {
 	@GetMapping("/rating/{bookId}")
 	public float getRating(@PathVariable int bookId) throws IOException {
 		return rDao.getBookRating(bookId);
+	}
+	
+	@PostMapping("/add-order")
+	public Map<String, String> addOrder(@ModelAttribute Cart cart) throws IOException {
+		return cDao.addOrder(cart);
+	}
+	
+	@GetMapping("/ordered/{username}")
+	public List<Cart> getOrder(@PathVariable String username) throws IOException {
+		return cDao.getAllOrderFromUser(username, 0);
+	}
+	
+	@GetMapping("/purchased/{username}")
+	public List<Cart> getPurchased(@PathVariable String username) throws IOException {
+		return cDao.getAllOrderFromUser(username, 1);
+	}
+	
+	@GetMapping("/sold/{bookId}")
+	public Map<String, String> getBookNumSold(@PathVariable int bookId) throws IOException {
+		return cDao.getNumSold(bookId);
+	}
+	
+	@DeleteMapping("/delete-order/{id}")
+	public Map<String, String> deleteOrder(@PathVariable int id) throws IOException {
+		return cDao.deleteUserOrder(id);
 	}
 }

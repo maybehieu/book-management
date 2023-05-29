@@ -53,6 +53,10 @@ const Login = () => {
                     updateLoginStatus(false)
                     updateAdminStatus(false)
                     setPasswordErr('Wrong password!')
+                } else if (data.response === 'null') {
+                    updateLoginStatus(false)
+                    updateAdminStatus(false)
+                    setUsernameErr("Username doesn't exist!")
                 } else {
                     updateLoginStatus(false)
                     updateAdminStatus(false)
@@ -62,10 +66,9 @@ const Login = () => {
     }
 
     useEffect(() => {
-        // updateLoginStatus(false)
-        // updateAdminStatus(false)
-        // setActiveUser('')
-    }, [])
+        setUsernameErr("")
+        setPasswordErr('')
+    }, [usernameRef.current, passwordRef.current])
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100" style={{ backgroundColor: '#f8f9fa' }}>

@@ -57,7 +57,8 @@ function AdminBooks(props) {
             <h2 className="text-center">Books List</h2>
             <div className="row">
                 <div className="col-md-8 offset-md-2 mb-4">
-                    <button className="btn btn-primary" onClick={addBook}>
+                    <button className="btn btn-primary" onClick={addBook}
+                        style={{ display: isLoggedIn ? '' : 'none' }}>
                         Add Book
                     </button>
                 </div>
