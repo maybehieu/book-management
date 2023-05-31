@@ -19,14 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.LTW.LTW.Objects.Book;
 import com.LTW.LTW.Objects.Category;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/server")
-@CrossOrigin
 public class APIController {
 	BookDAO bDao = new BookDAO();
 	UserDAO uDao = new UserDAO();
 	ReviewDAO rDao = new ReviewDAO();
 	CartDAO cDao = new CartDAO();
+	DatabaseInitializer initDb = new DatabaseInitializer();
 	
 	@GetMapping("/image/{bookId}")
 	public ResponseEntity<?> getImage(@PathVariable int bookId) throws IOException {
@@ -95,6 +96,11 @@ public class APIController {
 		return rDao.getAllReview(bookId);
 	}
 	
+	@DeleteMapping("/delete-review/{id}")
+	public Map<String, String> deleteReview(@PathVariable int id) throws IOException {
+		return rDao.deleteReview(id);
+	}
+	
 	@GetMapping("/rating/{bookId}")
 	public float getRating(@PathVariable int bookId) throws IOException {
 		return rDao.getBookRating(bookId);
@@ -115,6 +121,11 @@ public class APIController {
 		return cDao.getAllOrderFromUser(username, 1);
 	}
 	
+	@GetMapping("/cart/{username}")
+	public List<Cart> getAllOrderCustomer(@PathVariable String username) throws IOException {
+		return cDao.getAllOrderFromUser(username, -1);
+	}
+	
 	@GetMapping("/sold/{bookId}")
 	public Map<String, String> getBookNumSold(@PathVariable int bookId) throws IOException {
 		return cDao.getNumSold(bookId);
@@ -123,5 +134,15 @@ public class APIController {
 	@DeleteMapping("/delete-order/{id}")
 	public Map<String, String> deleteOrder(@PathVariable int id) throws IOException {
 		return cDao.deleteUserOrder(id);
+	}
+	
+	@PostMapping("/update-order")
+	public Map<String, String> updateOrder(@ModelAttribute Cart cart) throws IOException {
+		return cDao.updateUserOrder(cart);
+	}
+	
+	@GetMapping("/pending-orders")
+	public List<Cart> getPendingOrders() throws IOException {
+		return cDao.getAllOrderFromAdmin();
 	}
 }

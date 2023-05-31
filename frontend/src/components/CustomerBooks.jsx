@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from './AuthContext';
+import { NavbarContext } from './NavBarContext';
 
 function CustomerBooks(props) {
+    const { activeUser } = useContext(AuthContext)
+    const { reRender, setReRender } = useContext(NavbarContext)
+
     const [categories, setCategories] = useState([])
     const [books, setBooks] = useState([])
     const [ratings, setRatings] = useState([])
@@ -13,20 +18,28 @@ function CustomerBooks(props) {
         navigate('/book/' + bookId)
     }
 
-    const getRating = (bookId) => {
-        console.log(bookId)
-        fetch('http://localhost:9091/server/rating/' + bookId, {
-            method: 'GET'
-        })
-            .then((res) => res.json())
-            .then((dataa) => {
-                console.log(dataa)
-                return dataa;
-            })
-    }
+    const addCartHandle = (bookId) => {
+        var orderForm = new FormData()
+        orderForm.append('id', 0)
+        orderForm.append('username', activeUser)
+        orderForm.append('bookId', bookId)
+        orderForm.append('status', 0)
+        orderForm.append('amount', 0)
+        orderForm.append('createdAt', '2022-01-27 21:45:32.064')
+        orderForm.append('updatedAt', '2022-01-27 21:45:32.064')
 
-    const addCartHandle = (e) => {
-        e.preventDefault()
+        fetch('http://localhost:9091/server/add-order', {
+            method: 'POST',
+
+            body: orderForm
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                window.alert(data.response)
+                setReRender(!reRender)
+                navigate('/cart')
+            })
+            .catch((err) => console.log(err))
     }
 
     useEffect(() => {
@@ -94,14 +107,14 @@ function CustomerBooks(props) {
                                                 <div className="d-flex">
                                                     <button
                                                         type="button"
-                                                        class="btn btn-outline-success"
+                                                        className="btn btn-outline-success"
                                                         onClick={() => {
-
+                                                            addCartHandle(book.bookId)
                                                         }}
                                                     >Add To Cart</button>
                                                     <button
                                                         type="button"
-                                                        class="btn btn-outline-info"
+                                                        className="btn btn-outline-info"
                                                         onClick={() => {
                                                             viewHandle(book.bookId)
                                                         }}
@@ -133,12 +146,14 @@ function CustomerBooks(props) {
                                                 <div className="d-flex">
                                                     <button
                                                         type="button"
-                                                        class="btn btn-outline-success"
-                                                        onClick={() => { }}
+                                                        className="btn btn-outline-success"
+                                                        onClick={() => {
+                                                            addCartHandle(book.bookId)
+                                                        }}
                                                     >Add To Cart</button>
                                                     <button
                                                         type="button"
-                                                        class="btn btn-outline-info"
+                                                        className="btn btn-outline-info"
                                                         onClick={() => {
                                                             viewHandle(book.bookId)
                                                         }}

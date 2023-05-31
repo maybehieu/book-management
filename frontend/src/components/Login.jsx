@@ -17,7 +17,8 @@ const Login = () => {
         e.preventDefault()
         let username = usernameRef.current.value
         let password = passwordRef.current.value
-
+        setUsernameErr("")
+        setPasswordErr('')
         if (username === '') {
             setUsernameErr('Username cannot be empty!')
             return
@@ -66,8 +67,7 @@ const Login = () => {
     }
 
     useEffect(() => {
-        setUsernameErr("")
-        setPasswordErr('')
+
     }, [usernameRef.current, passwordRef.current])
 
     return (

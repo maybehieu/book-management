@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +17,9 @@ public class ReviewDAO {
 	private String jdbcPassword = "1234";
 	
 	private static final String INSERT_REVIEW = "insert into review(username, bookId, comment, rating) values (?,?,?,?)";
-	private static final String GET_ALL_REVIEW_BY_BOOK = "select id, username, comment, rating from review where bookId=?";
+	private static final String GET_ALL_REVIEW_BY_BOOK = "select id, username, comment, rating, createdAt from review where bookId=?";
 	private static final String GET_RATING_OF_BOOK = "select AVG(rating) as avgRating from review where bookId=?";
+	private static final String DELETE_REVIEW = "delete from review where id=?";
 	
 	protected Connection getConnection() {
 		Connection connection = null;
@@ -74,7 +76,8 @@ public class ReviewDAO {
 				String username = rs.getString("username");
 				String comment = rs.getString("comment");
 				float rating = rs.getFloat("rating");
-				reviews.add(new Review(id, username, bookId, comment, rating));
+				Timestamp createdAt = rs.getTimestamp("createdAt");
+				reviews.add(new Review(id, username, bookId, comment, rating, createdAt));
 			}
 		} catch (SQLException e) {
 			// TODO: handle exception
@@ -94,11 +97,26 @@ public class ReviewDAO {
 			while (rs.next()) {
 				rating = rs.getFloat("avgRating");
 			}
-			System.out.println(rating);
+			
 		} catch (SQLException e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
 		return rating;
+	}
+	
+	public Map<String, String> deleteReview(int id) {
+		try (
+				Connection connection = getConnection();
+				PreparedStatement ps = connection.prepareStatement(DELETE_REVIEW);
+			) {
+			ps.setInt(1, id);
+			ps.execute();
+			return makeResponse("Success!");
+		} catch (SQLException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return makeResponse("Internal error");
 	}
 }

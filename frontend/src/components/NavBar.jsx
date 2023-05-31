@@ -1,14 +1,44 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from './AuthContext'
+import { NavbarContext } from './NavBarContext';
 const NavBar = () => {
-  const { isLoggedIn, activeUser } = useContext(AuthContext);
+  const { isLoggedIn, activeUser, isAdmin, isPageSwitch } = useContext(AuthContext);
   const { updateLoginStatus, updateAdminStatus, updateActiveUser } = useContext(AuthContext);
+
+  const { reRender } = useContext(NavbarContext)
+
+  const [showIndicator, isShowIndicator] = useState(false)
+  const [numIndicator, setNumIndicator] = useState(0)
 
   const logoutHandle = () => {
     updateActiveUser('')
     updateAdminStatus(false)
     updateLoginStatus(false)
   }
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      var api = ''
+
+      if (isAdmin) {
+        api = 'http://localhost:9091/server/pending-orders'
+      } else {
+        api = 'http://localhost:9091/server/cart/' + activeUser
+      }
+      fetch(api)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.length > 0) {
+            console.log(data.length)
+            isShowIndicator(true)
+            setNumIndicator(data.length)
+          } else {
+            isShowIndicator(false)
+          }
+        })
+        .catch((err) => console.log(err))
+    }
+  }, [activeUser, isPageSwitch, reRender])
   return (
     <div>
       {/* <!-- Navbar --> */}
@@ -46,9 +76,34 @@ const NavBar = () => {
             </div>
 
             <div className="d-flex align-items-center me-3">
-              <a className="text-reset" href="http://localhost:3000/cart">
-                <i className="fas fa-shopping-cart fa-lg"></i>
-              </a>
+              {
+                isLoggedIn && (
+                  <a className="text-reset" href="http://localhost:3000/cart">
+                    {isAdmin ? (
+                      <>
+                        <i className="fas fa-truck fa-lg"></i>
+                        {
+                          showIndicator && (
+                            <span className="position-absolute translate-middle badge bg-primary circle">
+                              {numIndicator}
+                            </span>
+                          )
+                        }
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-shopping-cart fa-lg"></i>
+                        {
+                          showIndicator && (
+                            <span className="position-absolute translate-middle badge bg-primary circle">
+                              {numIndicator}
+                            </span>
+                          )
+                        }
+                      </>
+                    )}
+                  </a>)
+              }
             </div>
 
             <div className="d-flex align-items-center me-3">

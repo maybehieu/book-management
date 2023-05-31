@@ -38,6 +38,8 @@ public class BookDAO {
 			+ " where bookId=?";
 	private static final String DELETE_BOOK_SQL_STRING = "delete from book where bookId=?";
 	
+	private static final String GET_BOOK_SALE = "select SUM(amount) as saleAmount from cart where bookId=? and status=2";
+	
 	public BookDAO() {
 		
 	}
@@ -90,7 +92,7 @@ public class BookDAO {
 				Date date = resultSet.getDate("releaseDate");
 				int categoryId = resultSet.getInt("categoryId");
 				int pageNum = resultSet.getInt("pageNum");
-				int sold = resultSet.getInt("numSold");
+				int sold = getBookSale(id);
 				String coverPath = resultSet.getString("coverPath");
 				
 				books.add(new Book(id, title, author, description, date, categoryId, pageNum, sold, coverPath));
@@ -238,7 +240,7 @@ public class BookDAO {
 		try {
 			imgPath = ImageService.uploadImage(book.getImageFile());
 			//check if saving image successful or not
-			if (imgPath.equals(null)) {
+			if (imgPath.equals("")) {
 				return makeResponse("Can't save image to local storage, operation aborted!");
 			}
 		} catch (IOException e) {
@@ -256,7 +258,11 @@ public class BookDAO {
 			ps.setDate(4, book.getReleaseDate());
 			ps.setInt(5, book.getCategoryId());
 			ps.setInt(6, book.getNumPage());
-			if (!imgPath.equals("")) {
+			if (imgPath.equals("delete")) {
+				ps.setString(7, "");
+				ps.setInt(8, book.getBookId());
+			}
+			else if (!imgPath.equals("")) {
 				ps.setString(7, imgPath);
 				ps.setInt(8, book.getBookId());
 			} else {
@@ -285,5 +291,22 @@ public class BookDAO {
 			e.printStackTrace();
 		}
 		return makeResponse("Internal error!");
+	}
+	
+	public int getBookSale(int id) {
+		try (
+				Connection connection = getConnection();
+				PreparedStatement ps = connection.prepareStatement(GET_BOOK_SALE);
+		) {
+			ps.setInt(1, id);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				return rs.getInt("saleAmount");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 }

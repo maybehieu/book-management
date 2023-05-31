@@ -2,17 +2,20 @@ package com.LTW.LTW.Backend;
 
 import java.sql.Timestamp;
 
+
 public class Cart {
 	int id;
 	String username;
 	int bookId;
 	int status;
+	int amount;
 	Timestamp createdAt;
 	Timestamp updatedAt;
-	public Cart(int id, String username, int bookId, int status, Timestamp createdAt, Timestamp updatedAt) {
+	public Cart(int id, String username, int bookId, int amount, int status, Timestamp createdAt, Timestamp updatedAt) {
 		this.id = id;
 		this.username = username;
 		this.bookId = bookId;
+		this.amount = amount;
 		this.status = status;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
@@ -28,6 +31,12 @@ public class Cart {
 	}
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	public int getAmount() {
+		return amount;
+	}
+	public void setAmount(int amount) {
+		this.amount = amount;
 	}
 	public int getBookId() {
 		return bookId;

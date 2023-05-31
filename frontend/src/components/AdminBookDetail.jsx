@@ -30,12 +30,12 @@ const AdminBookDetail = ({ add }) => {
     const [author, setAuthor] = useState('')
     const [desc, setDesc] = useState('')
     const [date, setDate] = useState('')
-    const [catId, setCatId] = useState(-1)
+    const [catId, setCatId] = useState(0)
     const [price, setPrice] = useState(0)
     const [pageNum, setPageNum] = useState(0)
     const [numSold, setNumSold] = useState(0)
     const [imageFile, setImageFile] = useState()
-    const [imagePath, setImagePath] = useState('')
+    const [coverPath, setCoverPath] = useState()
 
     let { bookId } = useParams();
 
@@ -52,9 +52,21 @@ const AdminBookDetail = ({ add }) => {
         setNumSold(book.numSold)
         setDate(book.releaseDate)
         setCatId(book.categoryId)
+        setSelectedFile(dummyFile)
         setPreview("http://localhost:9091/server/image/" + bookId)
+        if (book.imgPath != undefined) {
+            console.log('setting book cover path!')
+            setCoverPath(book.imgPath)
+        }
     }
-
+    const uploadImage = () => {
+        // image uploading handler
+        if (!selectedFile) {
+            return;
+        }
+        const objectUrl = URL.createObjectURL(selectedFile);
+        setPreview(objectUrl);
+    }
     // create a preview as a side effect, whenever selected file is changed
     useEffect(() => {
         if (add) {
@@ -63,23 +75,18 @@ const AdminBookDetail = ({ add }) => {
             setSaveBtn('Add')
             console.log('adding new book')
             // adding new book
-            // image uploading handler
-            if (!selectedFile) {
-                setPreview(undefined);
-                return;
-            }
-            const objectUrl = URL.createObjectURL(selectedFile);
-            setPreview(objectUrl);
         } else {
             // view book in database
             setSaveBtn('Edit')
             setBookId(bookId)
+            console.log('editing')
             fetch("http://localhost:9091/server/select/" + bookId, {
                 method: 'GET'
             })
                 .then((response) => response.json())
                 // .then((data) => console.log(data))
                 .then((data) => {
+                    console.log(data)
                     setBook(data);
                     setBookData(data);
                 })
@@ -98,7 +105,16 @@ const AdminBookDetail = ({ add }) => {
             // }
 
         }
-    }, [selectedFile]);
+    }, []);
+
+    useEffect(() => {
+        if (!selectedFile) {
+            setPreview(undefined)
+            return;
+        }
+        const objectUrl = URL.createObjectURL(selectedFile);
+        setPreview(objectUrl);
+    }, [selectedFile])
 
     const onSelectFile = (e) => {
         if (!e.target.files || e.target.files.length === 0) {
@@ -110,10 +126,32 @@ const AdminBookDetail = ({ add }) => {
         //console.log(e.target.files[0])
     }
 
+    const onDeleteCover = (e) => {
+        e.preventDefault()
+        console.log('delete btn called');
+        setSelectedFile(undefined);
+        setImageFile(undefined);
+        setCoverPath(undefined);
+    }
+
     const navigate = useNavigate()
 
     const saveHandler = (e) => {
         e.preventDefault()
+
+        if (!title || title?.trim() == '') {
+            window.alert('Title cannot be empty!')
+            return;
+        }
+        if (!author || author?.trim() == '') {
+            window.alert('Author cannot be empty!')
+            return;
+        }
+        if (!catId || catId == 0) {
+            window.alert('Please choose the category!')
+            return;
+        }
+
         if (editState == true) {
             console.log('update btn called')
             var bookform = new FormData()
@@ -126,11 +164,11 @@ const AdminBookDetail = ({ add }) => {
             // bookform.append('price', price)
             bookform.append('numPage', pageNum)
             // empty image bypass 
-            if (imageFile == undefined) {
+            if (imageFile == undefined || coverPath == undefined) {
                 bookform.append('imageFile', dummyFile)
-            }
-            bookform.append('imageFile', imageFile)
-
+            } else
+                bookform.append('imageFile', imageFile)
+            console.log(imageFile, coverPath)
             //console.log(bookid, title, author, desc, date, catId, pageNum, imageFile)
             //console.log(bookform)
             if (bookid != -1) {
@@ -296,8 +334,10 @@ const AdminBookDetail = ({ add }) => {
                                     onChange={(event) => { setCatId(event.target.value) }}
                                     disabled={(editState) ? "" : "disabled"}
                                     value={catId}
+                                    defaultValue={0}
+                                    required
                                 >
-                                    <option selected>Open this select menu</option>
+                                    <option value='0'>Open this select menu</option>
                                     <option value="1">Romance</option>
                                     <option value="2">Cookbook</option>
                                     <option value="3">Health</option>
@@ -315,13 +355,23 @@ const AdminBookDetail = ({ add }) => {
                     <div class="col col-12 col-md-4">
                         <div class="d-flex flex-column justify-content-center">
                             {/* <!-- Choose file button --> */}
-                            <input type="file" id="upload"
+                            <div className="d-flex gap-2"><input type="file" id="upload"
                                 hidden
                                 onChange={onSelectFile}
                                 disabled={(editState) ? "" : "disabled"} />
-                            <label for="upload" class="btn btn-outline-secondary mb-4">
-                                Choose file
-                            </label>
+                                <label for="upload" class="btn btn-outline-secondary mb-4">
+                                    Choose file
+                                </label>
+                                {
+                                    coverPath && (<>
+                                        <button
+                                            type="button"
+                                            onClick={onDeleteCover}
+                                            className="btn btn-outline-danger mb-4"
+                                            disabled={(editState) ? "" : "disabled"} >Delete file</button>
+                                    </>)
+                                }
+                            </div>
                             {/* <!-- File container --> */}
                             <div
                                 style={{ maxHeight: "400px", display: 'flex', justifyContent: 'center', alignContent: 'center' }}

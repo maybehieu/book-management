@@ -7,6 +7,7 @@ function AdminBooks(props) {
 
     const [books, setBooks] = useState([])
     const [categories, setCategories] = useState([])
+    const [sales, setSales] = useState([])
 
     const navigate = useNavigate()
     const addBook = () => {
@@ -48,8 +49,6 @@ function AdminBooks(props) {
                     .catch((err) => console.log(err))
             })
             .catch((err) => console.log(err))
-
-
     }, [])
 
     return (

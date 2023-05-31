@@ -21,6 +21,8 @@ const CustomerBookDetails = () => {
 
     const [reviews, setReviews] = useState([])
 
+    const [render, setRender] = useState(false)
+
     let { bookId } = useParams();
 
     const backHandler = () => {
@@ -45,6 +47,17 @@ const CustomerBookDetails = () => {
                     navigate('/book/' + bookid)
                 else
                     window.alert(data.response)
+            })
+    }
+
+    const deleteReviewHandle = (id) => {
+        fetch('http://localhost:9091/server/delete-review/' + id, {
+            method: 'DELETE'
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                window.alert(data.response)
+                setRender(!render)
             })
     }
 
@@ -80,7 +93,15 @@ const CustomerBookDetails = () => {
             .catch((err) => console.log(err));
 
 
-    }, [])
+    }, [render])
+
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp); // Create a Date object from the SQL timestamp
+        // Format the date into a desired string representation (e.g., using toLocaleString())
+        const formattedDate = date.toLocaleString();
+
+        return formattedDate;
+    }
 
     return (
         <div class="container my-5">
@@ -292,6 +313,8 @@ const CustomerBookDetails = () => {
                                             {activeUser === review.username ? "You" : review.username}
                                         </span>
                                         <span className="badge bg-primary">{review.rating} / 5</span>
+                                        <span className='ms-2'
+                                            style={{ opacity: 0.5, fontSize: '0.8em' }}>{formatTimestamp(review.createdAt)}</span>
                                     </div>
                                 </div>
                                 <div
@@ -301,6 +324,16 @@ const CustomerBookDetails = () => {
                                         marginTop: 10,
                                     }}>{review.comment}</div>
                             </div>
+                            {
+                                review.username === activeUser && (
+                                    <button
+                                        className="btn btn-outline-danger position-absolute top-0 end-0 mt-3 me-2"
+                                        onClick={() => {
+                                            deleteReviewHandle(review.id)
+                                        }}
+                                    >Delete</button>
+                                )
+                            }
                         </div>
                     ))}
                 </div>

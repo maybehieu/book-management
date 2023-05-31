@@ -17,7 +17,8 @@ public class ImageService {
 	
 	public static String uploadImage(MultipartFile file) throws IOException {
 		try {
-			if (file.isEmpty() || file.getOriginalFilename().equals("null.txt")) return "";
+			if ( file.getOriginalFilename().equals("null.txt")) return "delete";
+			if (file.isEmpty()) return "empty";
 			String filePath = FOLDER_PATH + file.getOriginalFilename();
 			file.transferTo(new File(filePath));
 			return filePath;
