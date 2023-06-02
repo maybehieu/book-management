@@ -123,6 +123,7 @@ const AdminBookDetail = ({ add }) => {
         }
         setSelectedFile(e.target.files[0]);
         setImageFile(e.target.files[0]);
+        setCoverPath('not null')
         //console.log(e.target.files[0])
     }
 
@@ -280,6 +281,7 @@ const AdminBookDetail = ({ add }) => {
                                 class="form-control"
                                 rows="4"
                                 value={desc}
+                                maxLength={200}
                                 onChange={(event) => { setDesc(event.target.value) }}
                                 disabled={(editState) ? "" : "disabled"}
                             ></textarea>

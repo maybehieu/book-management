@@ -20,6 +20,10 @@ public class ImageService {
 			if ( file.getOriginalFilename().equals("null.txt")) return "delete";
 			if (file.isEmpty()) return "empty";
 			String filePath = FOLDER_PATH + file.getOriginalFilename();
+			File cFile = new File(filePath);
+			if (cFile.exists()) {
+				return filePath;
+			}
 			file.transferTo(new File(filePath));
 			return filePath;
 		} catch (Exception e) {

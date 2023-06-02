@@ -146,7 +146,7 @@ const Cart = () => {
         if (action == 2) {
             msg = 'Accept this order?'
         } else if (action == -1) {
-            msg = 'Decline this order'
+            msg = 'Decline this order?'
         }
         if (window.confirm(msg)) {
             var orderForm = new FormData()

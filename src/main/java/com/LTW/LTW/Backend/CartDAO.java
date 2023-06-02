@@ -17,9 +17,12 @@ public class CartDAO {
 	private String jdbcPassword = "1234";
 	
 	private static final String INSERT_ORDER = "insert into cart(username, bookId) values (?,?)";
-	private static final String GET_ALL_ORDER_BY_USERNAME = "select id, bookId, status, createdAt, updatedAt "
-			+ "from cart where username=?";
-	private static final String GET_ALL_ORDER_ADMIN = "select * from cart";
+	private static final String GET_ALL_ORDER_BY_USERNAME = "select c.id, c.bookId, c.status, c.createdAt, c.updatedAt "
+			+ "from cart as c "
+			+ "inner join book as b on c.bookId = b.bookId "
+			+ "where c.username=?";
+	private static final String GET_ALL_ORDER_ADMIN = "select c.* from cart as c "
+			+ "inner join book b on c.bookId = b.bookId";
 	private static final String GET_ALL_PURCHASED_BY_BOOKID = "select COUNT(id) as numSold from cart where bookId=? and status=1";
 	private static final String DELETE_USER_ORDER_STRING = "delete from cart where id=?";
 	private static final String CHECK_EXIST_ORDER = "select id from cart where username=? and bookId=? and status=0";

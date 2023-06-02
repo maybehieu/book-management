@@ -51,14 +51,16 @@ const CustomerBookDetails = () => {
     }
 
     const deleteReviewHandle = (id) => {
-        fetch('http://localhost:9091/server/delete-review/' + id, {
-            method: 'DELETE'
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                window.alert(data.response)
-                setRender(!render)
+        if (window.confirm('Delete this review?')) {
+            fetch('http://localhost:9091/server/delete-review/' + id, {
+                method: 'DELETE'
             })
+                .then((response) => response.json())
+                .then((data) => {
+                    window.alert(data.response)
+                    setRender(!render)
+                })
+        }
     }
 
     const setBookData = (book) => {
@@ -290,7 +292,7 @@ const CustomerBookDetails = () => {
                     </div>
                 </form>
                 <div className="container" style={{ padding: "40px 20px", marginTop: -50 }}>
-                    {reviews.map((review) => (
+                    {reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((review) => (
                         <div className="card mb-3" key={review.id}>
                             <div className="card-body">
                                 <div className="d-flex align-items-center">

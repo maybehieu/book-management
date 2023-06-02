@@ -278,6 +278,21 @@ public class BookDAO {
 		return makeResponse("Internal error!");
 	}
 	
+	public boolean checkDelete(int id) {
+		try (
+				Connection connection = getConnection();
+				PreparedStatement ps = connection.prepareStatement(DELETE_BOOK_SQL_STRING);
+		) {
+			ps.setInt(1, id);
+			ps.execute();
+			
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	public Map<String, String> delete(int id) {
 		try (
 				Connection connection = getConnection();
